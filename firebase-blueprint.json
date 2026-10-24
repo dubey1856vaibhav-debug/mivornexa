@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "workspace": {
+      "title": "Workspace",
+      "description": "Represents a business workspace or tenant profile",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner user UID" },
+        "name": { "type": "string", "description": "Business or workspace title" },
+        "tagline": { "type": "string", "description": "Subtitle or tagline" },
+        "businessType": { "type": "string", "description": "Industry classification" },
+        "currencySymbol": { "type": "string", "description": "Display currency symbol" },
+        "currencyCode": { "type": "string", "description": "ISO currency code" },
+        "taxRatePercent": { "type": "number", "description": "Tax percentage rate" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp" }
+      },
+      "required": ["userId", "name", "businessType"]
+    },
+    "customer": {
+      "title": "Customer",
+      "description": "Client profile registered within a workspace",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner user UID" },
+        "workspaceId": { "type": "string", "description": "Parent workspace ID" },
+        "name": { "type": "string", "description": "Customer full name" },
+        "phone": { "type": "string", "description": "Primary phone number" },
+        "email": { "type": "string", "description": "Primary email" },
+        "company": { "type": "string", "description": "Organization or company name" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp" }
+      },
+      "required": ["userId", "workspaceId", "name"]
+    },
+    "workRecord": {
+      "title": "WorkRecord",
+      "description": "Work order, ticket, or project record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner user UID" },
+        "workspaceId": { "type": "string", "description": "Parent workspace ID" },
+        "customerId": { "type": "string", "description": "Associated customer ID" },
+        "title": { "type": "string", "description": "Title or summary of the job" },
+        "status": { "type": "string", "description": "Current lifecycle status" },
+        "currentStageId": { "type": "string", "description": "Active workflow stage ID" },
+        "price": { "type": "number", "description": "Quoted total price" },
+        "paidAmount": { "type": "number", "description": "Amount collected to date" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp" }
+      },
+      "required": ["userId", "workspaceId", "customerId", "title"]
+    },
+    "invoice": {
+      "title": "Invoice",
+      "description": "Billing invoice associated with customer and workspace",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner user UID" },
+        "workspaceId": { "type": "string", "description": "Parent workspace ID" },
+        "customerId": { "type": "string", "description": "Billed customer ID" },
+        "invoiceNumber": { "type": "string", "description": "Unique human readable invoice code" },
+        "totalAmount": { "type": "number", "description": "Gross invoice total" },
+        "paidAmount": { "type": "number", "description": "Amount settled" },
+        "balanceDue": { "type": "number", "description": "Outstanding balance" },
+        "status": { "type": "string", "description": "Payment status" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp" }
+      },
+      "required": ["userId", "workspaceId", "customerId", "invoiceNumber"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/workspaces/{workspaceId}": {
+      "schema": { "$ref": "workspace" },
+      "description": "User specific business workspaces"
+    },
+    "/users/{userId}/customers/{customerId}": {
+      "schema": { "$ref": "customer" },
+      "description": "User specific customer profiles"
+    },
+    "/users/{userId}/workRecords/{workRecordId}": {
+      "schema": { "$ref": "workRecord" },
+      "description": "User specific job and work order records"
+    },
+    "/users/{userId}/invoices/{invoiceId}": {
+      "schema": { "$ref": "invoice" },
+      "description": "User specific financial invoices"
+    }
+  }
+}

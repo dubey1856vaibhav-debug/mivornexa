@@ -1,0 +1,95 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidTimestamp(field) {
+      return field == null || (field is timestamp && field <= request.time);
+    }
+
+    function isValidWorkspace(data) {
+      return data.userId is string &&
+             data.userId == request.auth.uid &&
+             data.name is string &&
+             data.name.size() > 0 &&
+             data.name.size() <= 100 &&
+             data.businessType is string &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidCustomer(data) {
+      return data.userId is string &&
+             data.userId == request.auth.uid &&
+             data.workspaceId is string &&
+             data.name is string &&
+             data.name.size() > 0 &&
+             data.name.size() <= 100 &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidWorkRecord(data) {
+      return data.userId is string &&
+             data.userId == request.auth.uid &&
+             data.workspaceId is string &&
+             data.customerId is string &&
+             data.title is string &&
+             data.title.size() > 0 &&
+             data.title.size() <= 150 &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidInvoice(data) {
+      return data.userId is string &&
+             data.userId == request.auth.uid &&
+             data.workspaceId is string &&
+             data.customerId is string &&
+             data.invoiceNumber is string &&
+             data.invoiceNumber.size() > 0 &&
+             data.invoiceNumber.size() <= 50 &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      match /workspaces/{workspaceId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidWorkspace(request.resource.data);
+        allow update: if isOwner(userId) && isValidWorkspace(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /customers/{customerId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidCustomer(request.resource.data);
+        allow update: if isOwner(userId) && isValidCustomer(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /workRecords/{workRecordId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidWorkRecord(request.resource.data);
+        allow update: if isOwner(userId) && isValidWorkRecord(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /invoices/{invoiceId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidInvoice(request.resource.data);
+        allow update: if isOwner(userId) && isValidInvoice(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

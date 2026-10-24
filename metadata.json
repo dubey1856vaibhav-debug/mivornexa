@@ -1,0 +1,6 @@
+{
+  "name": "Mivornexa",
+  "description": "Universal business management platform with native mobile & desktop web, animated authentication, customer portal, Shopify sync, and multi-provider AI automation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
